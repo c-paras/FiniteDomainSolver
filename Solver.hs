@@ -1,9 +1,13 @@
 {-# LANGUAGE GADTs #-}
 
+{-
+   Copyright (C) 2017 Costa Paraskevopoulos.
+   ...
+-}
+
 module Solver where
 
 import Formula
-
 
 -- Evaluating terms
 -- ----------------
@@ -11,7 +15,6 @@ import Formula
 eval :: Term t -> t
 eval _ = error "FIXME: implement eval"
 eval (Name _) = error "eval: Name"    -- this constructor is not relevant for evaluation
-
 
 -- Checking formulas
 -- -----------------
