@@ -21,7 +21,10 @@ eval (Name _)        = error "eval: Name" -- not relevant for evaluation
 -- determines whether a Formula is satisfiable
 satisfiable :: Formula ts -> Bool
 satisfiable (Body t)     = eval t -- unquantified formula is satisfiable iff it evaluates to True
-satisfiable (Exists v f) = error $ show v -- TODO
+satisfiable (Exists v f)
+  = case (f (Con (v !! 0))) of -- TODO: relax this assumption
+    (Exists v' f') -> satisfiable $ Exists v' f'
+    (Body term)    -> eval term
 
 -- computes a list of all the solutions of a Formula
 solutions :: Formula ts -> [ts]
