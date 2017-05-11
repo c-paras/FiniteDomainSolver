@@ -1,11 +1,11 @@
 {-
    Copyright (C) 2017 Costa Paraskevopoulos.
-   Defines an evaluator for untyped terms to construct logical formulas.
+   Defines an evaluator for untyped Terms to construct logical Formulas.
 -}
 
 module Unsafe where
 
--- untyped terms of a formula
+-- untyped Terms of a Formula
 data Term
   = Con     Val
   | And     Term Term
@@ -13,13 +13,13 @@ data Term
   | Smaller Term Term
   | Plus    Term Term
 
--- possible result types of evaluating the untyped terms
+-- possible result types of evaluating the untyped Terms
 data Val
   = IntV  Int
   | BoolV Bool
   deriving (Show)
 
--- evaluation of untyped terms including type checking
+-- evaluates an untyped Term & implements dynamic type checking
 eval :: Term -> Val
 eval (Con v)   = v
 eval (And p q) =
@@ -39,7 +39,7 @@ eval (Plus n m) =
     (IntV i1, IntV i2) -> IntV $ i1 + i2
     _                  -> error "Plus: expected Int arguments"
 
--- some example terms
+-- some example Terms
 t1 :: Term
 t1 = Con (BoolV True)
 t2 :: Term -> Term

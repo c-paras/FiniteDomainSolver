@@ -2,7 +2,7 @@
 
 {-
    Copyright (C) 2017 Costa Paraskevopoulos.
-   Tests the evaluation of logical terms.
+   Tests the evaluation of logical Terms.
 -}
 
 module TestEval where
@@ -13,7 +13,7 @@ import Solver
 main :: IO ()
 main = do
 
-  -- constant terms
+  -- constant Terms
   assert (Con True) True
   assert (Con False) False
   assert (Con 0) 0
@@ -22,19 +22,19 @@ main = do
   assert (Con 10) 10
   assert (Con (-3)) (-3)
 
-  -- and terms
+  -- "And" Terms
   assert (And (Con True) (Con True)) True
   assert (And (Con True) (Con False)) False
   assert (And (Con False) (Con True)) False
   assert (And (Con False) (Con False)) False
 
-  -- or terms
+  -- "Or" Terms
   assert (Or (Con True) (Con True)) True
   assert (Or (Con True) (Con False)) True
   assert (Or (Con False) (Con True)) True
   assert (Or (Con False) (Con False)) False
 
-  -- smaller terms
+  -- "Smaller" Terms
   assert (Smaller (Con 0) (Con 1)) True
   assert (Smaller (Con 5) (Con 10)) True
   assert (Smaller (Con (-4)) (Con 0)) True
@@ -44,7 +44,7 @@ main = do
   assert (Smaller (Con 83) (Con (-40))) False
   assert (Smaller (Con 0) (Con 0)) False
 
-  -- plus terms
+  -- "Plus" Terms
   assert (Plus (Con 5) (Con 6)) 11
   assert (Plus (Con 5) (Con (-5))) 0
   assert (Plus (Con 24) (Con 8)) 32
@@ -54,7 +54,7 @@ main = do
   assert (Plus (Con 16) (Con 16)) 32
   assert (Plus (Con 0) (Con 0)) 0
 
-  -- compound terms
+  -- compound Terms
   assert (And (And (Con True) (Con True)) (Con False)) False
   assert (Or (Or (Con True) (Con True)) (Con True)) True
   assert (Or (And (Con False) (Con False)) (Con False)) False
@@ -68,6 +68,6 @@ main = do
   assert (Smaller (Plus (Con 4) (Con 12)) (Con 19)) True
   assert (Or (Smaller (Con 4) (Con 2)) (Con True)) True
 
--- prints True if the term evaluates to the expected result; false otherwise
+-- prints True if the Term evaluates to the expected result; false otherwise
 assert :: Eq a => Term a -> a -> IO ()
 assert term result = putStrLn $ show $ eval term == result
