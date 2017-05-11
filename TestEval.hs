@@ -68,6 +68,6 @@ main = do
   assert (Smaller (Plus (Con 4) (Con 12)) (Con 19)) True
   assert (Or (Smaller (Con 4) (Con 2)) (Con True)) True
 
--- prints True if the Term evaluates to the expected result; false otherwise
+-- prints True if the Term evaluates to the expected result; False otherwise
 assert :: Eq a => Term a -> a -> IO ()
 assert term result = putStrLn $ show $ eval term == result

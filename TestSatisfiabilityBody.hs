@@ -53,6 +53,6 @@ main = do
   assert (Body (Smaller (Plus (Con 4) (Con 12)) (Con 19))) True
   assert (Body (Or (Smaller (Con 4) (Con 2)) (Con True))) True
 
--- prints True if the Formula is saitsfiable; false otherwise
+-- prints True if the Formula is saitsfiable; False otherwise
 assert :: Eq a => Formula a -> Bool -> IO ()
 assert formula result = putStrLn $ show $ satisfiable formula == result

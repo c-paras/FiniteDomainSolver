@@ -27,11 +27,11 @@ satisfiable (Exists v f) = checkAllInstantiations v f -- where v is the set of v
     checkAllInstantiations :: [a] -> (Term a -> Formula as) -> Bool
     checkAllInstantiations v f =
       if length v == 0
-      then False
-      else checkAllInstantiations (tail v) f ||
-           case (f (Con (v !! 0))) of
+      then False -- run out of instantiations
+      else case (f (Con (v !! 0))) of
              (Exists v' f') -> satisfiable $ Exists v' f' -- formula may have multiple quantified variables
              (Body term)    -> eval term -- otherwise, return what the term evaluates to
+           || checkAllInstantiations (tail v) f
 
 -- computes a list of all the solutions of a Formula
 solutions :: Formula ts -> [ts]
