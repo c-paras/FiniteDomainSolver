@@ -41,7 +41,7 @@ main = do
 
   let f = Exists [] $ \n ->
           Body $ (n `Plus` Con (-1)) `Smaller` n
-  assert f False -- de facto satisfiability for an empty wuantification (since n is a free variable)
+  assert f False -- de facto satisfiability for an empty quantification (since n is a free variable)
 
   -- example 3: p \/ (0 < n) and variants
 
