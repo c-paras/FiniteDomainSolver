@@ -36,36 +36,41 @@ satisfiable (Exists v f) = checkAllInstantiations v f -- where v is the set of v
 -- computes a list of all the solutions of a Formula
 solutions :: Formula ts -> [ts]
 solutions (Body t) = [()] -- solution to an unquantified Forumula is trivial
-solutions e@(Exists v f) = getSols e
+solutions f'@(Exists v f) = getSols f'
 --solutions (Exists v f) = findSol v f []
 --solutions (Exists v f) = [(head v, solutions (f (Con (head v)))), (solutions (Exists (tail v) f))]
   where
+    -- finds all possible sols
     getSols :: Formula ts -> [ts]
-    getSols (Body t) = [()]
+    getSols (Body t)     = [()] -- trivial case
     getSols (Exists v f) =
       if length v == 0
-      then []
+      then [] -- run out of instantiations
       else let
-             a = (getSol (Exists [head v] f))
-             c = case ((f (Con (head v)))) of
-                   (Body t) -> []
+             s    = (getSol (Exists [head v] f))
+             rest = case ((f (Con (head v)))) of
+                   (Body t)       -> []
                    (Exists v' f') -> putHeadInFront (head v) (getSols (Exists v' f'))
-           in a : ((getSols (Exists (tail v) f)) ++ c)
+           in s : -- sol using 1st value of 1st quantified variable
+              ((getSols (Exists (tail v) f)) ++ -- sol using rest of values for 1st quantified variable
+              rest) -- sol using all values of rest of quantified variables
 
+    -- returns sol by expanding the lambda terms of the Formula
     getSol :: Formula ts -> ts
-    getSol (Body t) = ()
-    getSol (Exists v f) = ((head v), b)
+    getSol (Body t)     = ()
+    getSol (Exists v f) = ((head v), s) -- sol is a nested tuple
       where
-        a = (f (Con (head v)))
-        b = getSol a
+        f' = (f (Con (head v))) -- expand rest of terms
+        s  = getSol f'
+
+    -- re-inserts the head value into the sol to create a valid list of tuples of type (a,as) not as
+    putHeadInFront :: a -> [(b,c)] -> [(a,(b,c))]
+    putHeadInFront h [] = []
+    putHeadInFront h (x:xs) = (h, x) : putHeadInFront h xs
 
 --    getSol' :: Formula ts -> [ts]
 --    getSol' (Body t) = [()]
 --    getSol' (Exists v f) = putHeadInFront (head v) (getSols $ Exists v f)
-
-    putHeadInFront :: a -> [(b,c)] -> [(a,(b,c))]
-    putHeadInFront h [] = []
-    putHeadInFront h (x:xs) = (h, x) : putHeadInFront h xs
 {-
 -------------------------------
     -- tries all values of the quantified variables
