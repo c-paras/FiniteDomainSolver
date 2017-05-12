@@ -36,10 +36,15 @@ satisfiable (Exists v f) = checkAllInstantiations v f -- where v is the set of v
 -- computes a list of all the solutions of a Formula
 solutions :: Formula ts -> [ts]
 solutions (Body t) = [()] -- solution to an unquantified Forumula is trivial
-solutions f'@(Exists v f) = getSols f'
+solutions f'@(Exists v f) = filterNonSols $ getSols f'
 --solutions (Exists v f) = findSol v f []
 --solutions (Exists v f) = [(head v, solutions (f (Con (head v)))), (solutions (Exists (tail v) f))]
   where
+    -- checks whether a solution is an actual solution & returns a list of those that are
+    filterNonSols :: [ts] -> [ts]
+    filterNonSols [] = []
+    filterNonSols (x:xs) = x : filterNonSols xs -- TODO: no-op atm
+
     -- finds all possible sols
     getSols :: Formula ts -> [ts]
     getSols (Body t)     = [()] -- trivial case
@@ -47,11 +52,11 @@ solutions f'@(Exists v f) = getSols f'
       if length v == 0
       then [] -- run out of instantiations
       else let
-             s    = (getSol (Exists [head v] f))
-             rest = case ((f (Con (head v)))) of
+             sol  = getSol (Exists [head v] f)
+             rest = case (f (Con (head v))) of
                    (Body t)       -> []
                    (Exists v' f') -> putHeadInFront (head v) (getSols (Exists v' f'))
-           in s : -- sol using 1st value of 1st quantified variable
+           in sol : -- sol using 1st value of 1st quantified variable
               ((getSols (Exists (tail v) f)) ++ -- sol using rest of values for 1st quantified variable
               rest) -- sol using all values of rest of quantified variables
 
@@ -60,7 +65,7 @@ solutions f'@(Exists v f) = getSols f'
     getSol (Body t)     = ()
     getSol (Exists v f) = ((head v), s) -- sol is a nested tuple
       where
-        f' = (f (Con (head v))) -- expand rest of terms
+        f' = f (Con (head v)) -- expand rest of terms
         s  = getSol f'
 
     -- re-inserts the head value into the sol to create a valid list of tuples of type (a,as) not as
