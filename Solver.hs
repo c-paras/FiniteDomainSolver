@@ -37,14 +37,11 @@ satisfiable (Exists v f) = checkAllInstantiations v f -- where v is the set of v
 -- computes a list of all the solutions of a Formula
 solutions :: Formula ts -> [ts]
 solutions (Body t)        = [()] -- solution to an unquantified Forumula is trivial
-solutions f'@(Exists v f) = getSols f' -- nubBy cmp $ getSols f'
---solutions (Exists v f) = findSol v f []
---solutions (Exists v f) = [(head v, solutions (f (Con (head v)))), (solutions (Exists (tail v) f))]
+solutions f'@(Exists v f) = nubBy cmp $ getSols f'
   where
     -- compares two nested tuples (in order to remove duplicates using num)
---    cmp :: ts1 -> ts2 -> Bool
---    cmp () () = True
---    cmp a b = fst a == fst b -- && cmp (snd a) (snd b)
+    cmp :: Show ts => ts -> ts -> Bool
+    cmp a b = show a == show b -- this is a hack which just compares their string rep
 
     -- finds all possible sols
     getSols :: Formula ts -> [ts]

@@ -10,7 +10,7 @@ module Formula where
 -- logical Formula indexed by a list of the types of its existentially-quantified variables
 data Formula ts where
   Body   :: Term Bool                     -> Formula ()
-  Exists :: Show a
+  Exists :: (Show a, Show as)
          => [a] -> (Term a -> Formula as) -> Formula (a, as)
 
 -- Terms that form logical formulas indexed by their type
