@@ -37,6 +37,7 @@ satisfiable (Exists v f) = checkAllInstantiations v f -- where v is the set of v
 solutions :: Formula ts -> [ts]
 solutions (Body t) = [()] -- solution to an unquantified Forumula is trivial
 solutions e@(Exists v f) = getSols e
+--solutions (Exists v f) = findSol v f []
 --solutions (Exists v f) = [(head v, solutions (f (Con (head v)))), (solutions (Exists (tail v) f))]
   where
     getSols :: Formula ts -> [ts]
@@ -49,20 +50,24 @@ solutions e@(Exists v f) = getSols e
     getSol :: Formula ts -> ts
     getSol (Body t) = ()
     getSol (Exists v f) = (head v, getSol (f (Con (head v))))
-
 {-
-solutions (Exists v f) = [findAllSolutions v f] -- start with an empty soln set
-  where
-    -- tries all values of the quantified variable
---    findAllSolutions :: [a] -> (Term a -> Formula as) -> ts -> [ts]
-    findAllSolutions :: [a] -> (Term a -> Formula as) -> ts
-    findAllSolutions v f =
+-------------------------------
+    -- tries all values of the quantified variables
+    findSol :: [a] -> (Term a -> Formula as) -> [ts] -> [ts]
+    findSol v f m =
       if length v == 0
-      then () -- error $ show $ v --solns -- [()] -- TODO: False -- run out of instantiations
-      else case (f (Con (v !! 0))) of
-             f1@(Exists v' f') -> (v !! 0, findAllSolutions v' f') -- [(v !! 0, (findAllSolutions (tail v) f1))] -- $ [(v !! 0, solns)] -- Formula may have multiple quantified variables
-             (Body term)    -> if eval term == True -- otherwise, check if the Term evaluates to True
-                               then () -- error "aa" -- [(v !! 0, solns)] -- append current soln to the soln set
-                               else () -- error "" --[solns] -- no new soln to add
---           || checkAllInstantiations (tail v) f -- TODO: relax this assumption
+      then m
+      else case (f (Con (head v))) of
+             (Exists v' f') -> let
+--                                 a = solutions $ Exists v' f'
+                                 a = findSol v' f' $ putHeadInFront (head v) m
+                                 b = a --putHeadInFront (head v) a
+                               in b
+             (Body term)    -> putHeadInFront (head v) m
+           ++ findSol (tail v) f m
+
+    putHeadInFront :: a -> [(b,c)] -> [(a,(b,c))]
+    putHeadInFront h [] = [h]
+    putHeadInFront h (x:xs) = (h, x) : putHeadInFront h xs
+---------------------------------
 -}
