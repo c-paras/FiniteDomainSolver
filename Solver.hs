@@ -45,11 +45,27 @@ solutions e@(Exists v f) = getSols e
     getSols (Exists v f) =
       if length v == 0
       then []
-      else (getSol (Exists [head v] f)) : (getSols (Exists (tail v) f))
+      else let
+             a = (getSol (Exists [head v] f))
+             c = case ((f (Con (head v)))) of
+                   (Body t) -> []
+                   (Exists v' f') -> putHeadInFront (head v) (getSols (Exists v' f'))
+           in a : ((getSols (Exists (tail v) f)) ++ c)
 
     getSol :: Formula ts -> ts
     getSol (Body t) = ()
-    getSol (Exists v f) = (head v, getSol (f (Con (head v))))
+    getSol (Exists v f) = ((head v), b)
+      where
+        a = (f (Con (head v)))
+        b = getSol a
+
+--    getSol' :: Formula ts -> [ts]
+--    getSol' (Body t) = [()]
+--    getSol' (Exists v f) = putHeadInFront (head v) (getSols $ Exists v f)
+
+    putHeadInFront :: a -> [(b,c)] -> [(a,(b,c))]
+    putHeadInFront h [] = []
+    putHeadInFront h (x:xs) = (h, x) : putHeadInFront h xs
 {-
 -------------------------------
     -- tries all values of the quantified variables
