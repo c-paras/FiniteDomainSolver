@@ -8,6 +8,7 @@
 module Solver where
 
 import Formula
+import Data.List
 
 -- evaluates a logical Term
 eval :: Term t -> t
@@ -35,15 +36,15 @@ satisfiable (Exists v f) = checkAllInstantiations v f -- where v is the set of v
 
 -- computes a list of all the solutions of a Formula
 solutions :: Formula ts -> [ts]
-solutions (Body t) = [()] -- solution to an unquantified Forumula is trivial
-solutions f'@(Exists v f) = filterNonSols $ getSols f'
+solutions (Body t)        = [()] -- solution to an unquantified Forumula is trivial
+solutions f'@(Exists v f) = getSols f' -- nubBy cmp $ getSols f'
 --solutions (Exists v f) = findSol v f []
 --solutions (Exists v f) = [(head v, solutions (f (Con (head v)))), (solutions (Exists (tail v) f))]
   where
-    -- checks whether a solution is an actual solution & returns a list of those that are
-    filterNonSols :: [ts] -> [ts]
-    filterNonSols [] = []
-    filterNonSols (x:xs) = x : filterNonSols xs -- TODO: no-op atm
+    -- compares two nested tuples (in order to remove duplicates using num)
+--    cmp :: ts1 -> ts2 -> Bool
+--    cmp () () = True
+--    cmp a b = fst a == fst b -- && cmp (snd a) (snd b)
 
     -- finds all possible sols
     getSols :: Formula ts -> [ts]
@@ -52,30 +53,31 @@ solutions f'@(Exists v f) = filterNonSols $ getSols f'
       if length v == 0
       then [] -- run out of instantiations
       else let
-             sol  = getSol (Exists [head v] f)
-             rest = case (f (Con (head v))) of
-                   (Body t)       -> []
-                   (Exists v' f') -> putHeadInFront (head v) (getSols (Exists v' f'))
-           in sol : -- sol using 1st value of 1st quantified variable
-              ((getSols (Exists (tail v) f)) ++ -- sol using rest of values for 1st quantified variable
-              rest) -- sol using all values of rest of quantified variables
+             (sol, isSol) = getSol (Exists [head v] f)
+             rest         = case (f (Con (head v))) of
+                                   (Body t)       -> []
+                                   (Exists v' f') -> putHeadInFront (head v) (getSols (Exists v' f'))
+           in if isSol == True
+              then sol : -- sol using 1st value of 1st quantified variable
+                   ((getSols (Exists (tail v) f)) ++ -- sol using rest of values for 1st quantified variable
+                   rest) -- sol using all values of rest of quantified variables
+              else ((getSols (Exists (tail v) f)) ++ -- sol using rest of values for 1st quantified variable
+                   rest) -- sol using all values of rest of quantified variables
 
     -- returns sol by expanding the lambda terms of the Formula
-    getSol :: Formula ts -> ts
-    getSol (Body t)     = ()
-    getSol (Exists v f) = ((head v), s) -- sol is a nested tuple
+    -- also returns what the resulting term evaluates to
+    getSol :: Formula ts -> (ts, Bool)
+    getSol (Body t)     = ((), eval t)
+    getSol (Exists v f) = (((head v), sol), isSol) -- sol is a nested tuple
       where
-        f' = f (Con (head v)) -- expand rest of terms
-        s  = getSol f'
+        f'           = f (Con (head v)) -- expand rest of terms
+        (sol, isSol) = getSol f'
 
     -- re-inserts the head value into the sol to create a valid list of tuples of type (a,as) not as
     putHeadInFront :: a -> [(b,c)] -> [(a,(b,c))]
-    putHeadInFront h [] = []
+    putHeadInFront h []     = []
     putHeadInFront h (x:xs) = (h, x) : putHeadInFront h xs
 
---    getSol' :: Formula ts -> [ts]
---    getSol' (Body t) = [()]
---    getSol' (Exists v f) = putHeadInFront (head v) (getSols $ Exists v f)
 {-
 -------------------------------
     -- tries all values of the quantified variables
