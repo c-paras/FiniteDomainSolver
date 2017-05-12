@@ -20,7 +20,7 @@ data Term t where
   Or      :: Term Bool -> Term Bool -> Term Bool
   Smaller :: Term Int  -> Term Int  -> Term Bool
   Plus    :: Term Int  -> Term Int  -> Term Int
-  Name    :: String    -> Term t -- to facilitate pretty printing
+  Name    :: String                 -> Term t -- to facilitate pretty printing
 
 -- pretty printing for a Term
 instance Show t => Show (Term t) where
