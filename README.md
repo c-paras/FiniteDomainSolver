@@ -23,9 +23,13 @@ To run the satisfiability checker tests for quantified Formulas:
 ```
 ./TestSatisfiabilityExists.hs
 ```
-To run the solver tests:
+To run the solver tests for unquantified Formulas:
 ```
-./TestSolver.hs
+./TestSolverBody.hs
+```
+To run the solver tests for quantified Formulas:
+```
+./TestSolverExists.hs
 ```
 
 Copyright (C) 2017 Costa Paraskevopoulos
