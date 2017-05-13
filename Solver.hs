@@ -56,10 +56,10 @@ solutions f'@(Exists v f) = nubBy cmp $ getSols f'
                                    (Exists v' f') -> putHeadInFront (head v) (getSols (Exists v' f'))
            in if isSol == True
               then sol : -- sol using 1st value of 1st quantified variable
-                   ((getSols (Exists (tail v) f)) ++ -- sol using rest of values for 1st quantified variable
-                   rest) -- sol using all values of rest of quantified variables
-              else ((getSols (Exists (tail v) f)) ++ -- sol using rest of values for 1st quantified variable
-                   rest) -- sol using all values of rest of quantified variables
+                   (rest ++ -- sol using all values of rest of quantified variables
+                   (getSols (Exists (tail v) f))) -- sol using rest of values for 1st quantified variable
+              else (rest ++ -- sol using all values of rest of quantified variables
+                   (getSols (Exists (tail v) f))) -- sol using rest of values for 1st quantified variable
 
     -- returns sol by expanding the lambda terms of the Formula
     -- also returns what the resulting term evaluates to
@@ -74,25 +74,3 @@ solutions f'@(Exists v f) = nubBy cmp $ getSols f'
     putHeadInFront :: a -> [(b,c)] -> [(a,(b,c))]
     putHeadInFront h []     = []
     putHeadInFront h (x:xs) = (h, x) : putHeadInFront h xs
-
-{-
--------------------------------
-    -- tries all values of the quantified variables
-    findSol :: [a] -> (Term a -> Formula as) -> [ts] -> [ts]
-    findSol v f m =
-      if length v == 0
-      then m
-      else case (f (Con (head v))) of
-             (Exists v' f') -> let
---                                 a = solutions $ Exists v' f'
-                                 a = findSol v' f' $ putHeadInFront (head v) m
-                                 b = a --putHeadInFront (head v) a
-                               in b
-             (Body term)    -> putHeadInFront (head v) m
-           ++ findSol (tail v) f m
-
-    putHeadInFront :: a -> [(b,c)] -> [(a,(b,c))]
-    putHeadInFront h [] = [h]
-    putHeadInFront h (x:xs) = (h, x) : putHeadInFront h xs
----------------------------------
--}
